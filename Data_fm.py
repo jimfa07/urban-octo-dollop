@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -40,7 +39,7 @@ if "data" not in st.session_state:
         ])
         fila_inicial = {col: None for col in st.session_state.data.columns}
         fila_inicial["Saldo diario"] = 0.00
-        fila_inicial["Saldo Acumulado"] = -35
+        fila_inicial["Saldo Acumulado"] = -243.30
         st.session_state.data = pd.concat(
             [pd.DataFrame([fila_inicial]), st.session_state.data], ignore_index=True
         )
@@ -148,7 +147,7 @@ if opcion == "Registro":
             (depositos["Fecha"] == fecha) & (depositos["Empresa"] == proveedor)
         ]["Monto"].sum()
         saldo_diario = monto_deposito - total
-        saldo_acumulado = df["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario if df["Saldo Acumulado"].dropna().shape[0] > 0 else -35 + saldo_diario
+        saldo_acumulado = df["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario if df["Saldo Acumulado"].dropna().shape[0] > 0 else - 243.30 + saldo_diario
 
         nueva_fila = {
             "N": enumeracion,
@@ -165,7 +164,7 @@ if opcion == "Registro":
             "Kilos Restantes": kilos_restantes,
             "Libras Restantes": libras_restantes,
             "Total ($)": total,
-            "Monto DepÃ³sito": monto_deposito,
+            "Monto Deposito": monto_deposito,
             "Saldo diario": saldo_diario,
             "Saldo Acumulado": saldo_acumulado
         }
@@ -174,7 +173,7 @@ if opcion == "Registro":
         st.success("Registro agregado correctamente")
         st.session_state.data.to_pickle(DATA_FILE)
 
-    # Registro de Nota de DÃ©bito
+    # Registro de Nota de Debito
     st.subheader("Registro de Nota de Debito")
     with st.form("nota_debito"):
         col1, col2, col3 = st.columns(3)
