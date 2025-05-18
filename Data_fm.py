@@ -11,15 +11,15 @@ DATA_FILE = "registro_data.pkl"
 DEPOSITS_FILE = "registro_depositos.pkl"
 DEBIT_NOTES_FILE = "registro_notas_debito.pkl"
 
-st.set_page_config(page_title="Registro Proveedores y DepÃ³sitos", layout="wide")
+st.set_page_config(page_title="Registro Proveedores y Depositos", layout="wide")
 st.title("Registro de Proveedores - Producto Pollo")
 
 # Listas
 proveedores = ["LIRIS SA", "Gallina 1", "Monze Anzules", "Medina"]
-tipos_documento = ["Factura", "Nota de dÃ©bito", "Nota de crÃ©dito"]
+tipos_documento = ["Factura", "Nota de debito", "Nota de credito"]
 agencias = [
-    "Cajero AutomÃ¡tico Pichincha", "Cajero AutomÃ¡tico PacÃ­fico",
-    "Cajero AutomÃ¡tico Guayaquil", "Cajero AutomÃ¡tico Bolivariano",
+    "Cajero Automatico Pichincha", "Cajero Automatico Pacifico",
+    "Cajero Automatico Guayaquil", "Cajero Automatico Bolivariano",
     "Banco Pichincha", "Banco del Pacifico", "Banco de Guayaquil",
     "Banco Bolivariano"
 ]
@@ -32,11 +32,11 @@ if "data" not in st.session_state:
             st.session_state.data["Fecha"], errors="coerce").dt.date
     else:
         st.session_state.data = pd.DataFrame(columns=[
-            "NÂº", "Fecha", "Proveedor", "Producto", "Cantidad",
+            "N", "Fecha", "Proveedor", "Producto", "Cantidad",
             "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
             "Cantidad de gavetas", "Precio Unitario ($)", "Promedio",
             "Kilos Restantes", "Libras Restantes", "Total ($)",
-            "Monto DepÃ³sito", "Saldo diario", "Saldo Acumulado"
+            "Monto Deposito", "Saldo diario", "Saldo Acumulado"
         ])
         fila_inicial = {col: None for col in st.session_state.data.columns}
         fila_inicial["Saldo diario"] = 0.00
@@ -63,21 +63,21 @@ if "notas" not in st.session_state:
             "Fecha", "Libras calculadas", "Descuento", "Descuento posible", "Descuento real"
         ])
 
-# NavegaciÃ³n entre secciones
-opcion = st.sidebar.selectbox("Selecciona una vista", ["Registro", "Reporte Semanal", "Reporte Mensual", "GrÃ¡ficos"])
+# Navegacion entre secciones
+opcion = st.sidebar.selectbox("Selecciona una vista", ["Registro", "Reporte Semanal", "Reporte Mensual", "Graficos"])
 
 if opcion == "Registro":
-    # Sidebar - Registro de DepÃ³sitos
-    st.sidebar.header("Registro de DepÃ³sitos")
+    # Sidebar - Registro de Depositos
+    st.sidebar.header("Registro de Depositos")
     with st.sidebar.form("registro_form"):
         fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
         empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
         agencia = st.selectbox("Agencia", agencias, key="agencia")
         monto = st.number_input("Monto", min_value=0.0, format="%.2f", key="monto")
-        submit_d = st.form_submit_button("Agregar DepÃ³sito")
+        submit_d = st.form_submit_button("Agregar Deposito")
 
     if submit_d:
-        documento = "DepÃ³sito" if "Cajero" in agencia else "Transferencia"
+        documento = "Deposito" if "Cajero" in agencia else "Transferencia"
         df_actual = st.session_state.df
         coincidencia = df_actual[
             (df_actual["Fecha"] == fecha_d) & (df_actual["Empresa"] == empresa)
@@ -95,25 +95,25 @@ if opcion == "Registro":
 
         st.session_state.df = pd.concat([df_actual, pd.DataFrame([nuevo_registro])], ignore_index=True)
         st.session_state.df.to_pickle(DEPOSITS_FILE)
-        st.success("DepÃ³sito agregado exitosamente.")
+        st.success("Deposito agregado exitosamente.")
 
-    # Eliminar depÃ³sito
-    st.sidebar.subheader("Eliminar un DepÃ³sito")
+    # Eliminar deposito
+    st.sidebar.subheader("Eliminar un Deposito")
     if not st.session_state.df.empty:
         st.session_state.df["Mostrar"] = st.session_state.df.apply(
             lambda row: f"{row['Fecha']} - {row['Empresa']} - ${row['Monto']:.2f}", axis=1
         )
         deposito_a_eliminar = st.sidebar.selectbox(
-            "Selecciona un depÃ³sito a eliminar", st.session_state.df["Mostrar"]
+            "Selecciona un deposito a eliminar", st.session_state.df["Mostrar"]
         )
         if st.sidebar.button("Eliminar depÃ³sito seleccionado"):
             index_eliminar = st.session_state.df[st.session_state.df["Mostrar"] == deposito_a_eliminar].index[0]
             st.session_state.df.drop(index=index_eliminar, inplace=True)
             st.session_state.df.reset_index(drop=True, inplace=True)
             st.session_state.df.to_pickle(DEPOSITS_FILE)
-            st.sidebar.success("DepÃ³sito eliminado correctamente.")
+            st.sidebar.success("Deposito eliminado correctamente.")
     else:
-        st.sidebar.write("No hay depÃ³sitos para eliminar.")
+        st.sidebar.write("No hay depositos para eliminar.")
 
     # Registro de Proveedores
     st.subheader("Registro de Proveedores")
@@ -141,7 +141,7 @@ if opcion == "Registro":
         libras_restantes = kilos_restantes * 2.20462
         promedio = libras_restantes / cantidad if cantidad != 0 else 0
         total = libras_restantes * precio_unitario
-        enumeracion = df["Fecha"].nunique() + 1 if fecha not in df["Fecha"].dropna().values else df[df["Fecha"] == fecha]["NÂº"].iloc[0]
+        enumeracion = df["Fecha"].nunique() + 1 if fecha not in df["Fecha"].dropna().values else df[df["Fecha"] == fecha]["N"].iloc[0]
 
         depositos = st.session_state.df.copy()
         monto_deposito = depositos[
@@ -151,7 +151,7 @@ if opcion == "Registro":
         saldo_acumulado = df["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario if df["Saldo Acumulado"].dropna().shape[0] > 0 else -35 + saldo_diario
 
         nueva_fila = {
-            "NÂº": enumeracion,
+            "N": enumeracion,
             "Fecha": fecha,
             "Proveedor": proveedor,
             "Producto": producto,
@@ -175,7 +175,7 @@ if opcion == "Registro":
         st.session_state.data.to_pickle(DATA_FILE)
 
     # Registro de Nota de DÃ©bito
-    st.subheader("Registro de Nota de DÃ©bito")
+    st.subheader("Registro de Nota de Debito")
     with st.form("nota_debito"):
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -184,7 +184,7 @@ if opcion == "Registro":
             descuento = st.number_input("Descuento (%)", min_value=0.0, max_value=1.0, step=0.01)
         with col3:
             descuento_real = st.number_input("Descuento Real ($)", min_value=0.0, step=0.01)
-        agregar_nota = st.form_submit_button("Agregar Nota de DÃ©bito")
+        agregar_nota = st.form_submit_button("Agregar Nota de Debito")
 
     if agregar_nota:
         df = st.session_state.data.copy()
@@ -199,7 +199,7 @@ if opcion == "Registro":
         }
         st.session_state.notas = pd.concat([st.session_state.notas, pd.DataFrame([nueva_nota])], ignore_index=True)
         st.session_state.notas.to_pickle(DEBIT_NOTES_FILE)
-        st.success("Nota de dÃ©bito agregada correctamente")
+        st.success("Nota de debito agregada correctamente")
 
     # Actualizar saldo acumulado con descuento real
     for i, nota in st.session_state.notas.iterrows():
@@ -231,22 +231,22 @@ if opcion == "Registro":
     st.dataframe(df_display.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
     # Tabla de Notas de DÃ©bito
-    st.subheader("Tabla de Notas de DÃ©bito")
+    st.subheader("Tabla de Notas de Debito")
     st.dataframe(st.session_state.notas.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
     # Eliminar Nota de DÃ©bito
-    st.subheader("Eliminar una Nota de DÃ©bito")
+    st.subheader("Eliminar una Nota de Debito")
     if not st.session_state.notas.empty:
         st.session_state.notas["Mostrar"] = st.session_state.notas.apply(
             lambda row: f"{row['Fecha']} - Libras: {row['Libras calculadas']:.2f} - Descuento real: ${row['Descuento real']:.2f}", axis=1
         )
         nota_a_eliminar = st.selectbox("Selecciona una nota para eliminar", st.session_state.notas["Mostrar"])
-        if st.button("Eliminar Nota de DÃ©bito seleccionada"):
+        if st.button("Eliminar Nota de Debito seleccionada"):
             index_eliminar = st.session_state.notas[st.session_state.notas["Mostrar"] == nota_a_eliminar].index[0]
             st.session_state.notas.drop(index=index_eliminar, inplace=True)
             st.session_state.notas.reset_index(drop=True, inplace=True)
             st.session_state.notas.to_pickle(DEBIT_NOTES_FILE)
-            st.success("Nota de dÃ©bito eliminada correctamente.")
+            st.success("Nota de debito eliminada correctamente.")
 
     @st.cache_data
     def convertir_excel(df):
@@ -264,7 +264,7 @@ if opcion == "Registro":
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-    with st.expander("Ver depÃ³sitos registrados"):
+    with st.expander("Ver depositos registrados"):
         st.dataframe(st.session_state.df.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
 elif opcion == "Reporte Semanal":
@@ -283,8 +283,8 @@ elif opcion == "Reporte Mensual":
     df_mes = df[df["Fecha"].dt.month == mes_actual]
     st.dataframe(df_mes.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
-elif opcion == "GrÃ¡ficos":
-    st.header("GrÃ¡ficos de Proveedores")
+elif opcion == "Graficos":
+    st.header("Graficos de Proveedores")
     df = st.session_state.data.copy()
     df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
 
@@ -300,5 +300,5 @@ elif opcion == "GrÃ¡ficos":
     fig2, ax2 = plt.subplots()
     ax2.plot(df_ordenado["Fecha"], df_ordenado["Saldo Acumulado"], marker="o")
     ax2.set_ylabel("Saldo Acumulado ($)")
-    ax2.set_title("EvoluciÃ³n del Saldo Acumulado")
+    ax2.set_title("Evalucion del Saldo Acumulado")
     st.pyplot(fig2)
