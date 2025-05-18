@@ -178,14 +178,3 @@ elif menu == "Gráficos":
         "Total ($)": "sum", "Monto Depósito": "sum"
     }).reset_index()
     st.bar_chart(resumen.set_index("Proveedor"))
-
-
-Listo. He reenviado el código completo con todo integrado, incluyendo:
-
-Registro de proveedores y depósitos.
-
-Eliminación de filas mal ingresadas (depósitos).
-
-Reportes semanales y mensuales.
-
-Gráficos comparativos por proveedor.
