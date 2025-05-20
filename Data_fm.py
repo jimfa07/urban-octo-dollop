@@ -17,6 +17,10 @@ st.title("Registro de Proveedores - Producto Pollo")
 st.markdown("### Importar datos desde CSV")
 archivo_csv = st.file_uploader("Selecciona un archivo CSV", type=["csv"])
 
+# Inicializar st.session_state.data antes de importar CSV
+if "data" not in st.session_state:
+    st.session_state.data = pd.DataFrame()
+
 if archivo_csv is not None:
     try:
         df_csv = pd.read_csv(archivo_csv)
