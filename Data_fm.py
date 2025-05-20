@@ -227,14 +227,19 @@ if agregar_nota:
     st.session_state.notas.to_pickle(DEBIT_NOTES_FILE)  
     st.success("Nota de debito agregada correctamente")  
 
-# Actualizar saldo acumulado con descuento real  
-for i, nota in st.session_state.notas.iterrows():  
-    fecha = nota["Fecha"]  
-    descuento_real = nota["Descuento real"]  
-    indices = st.session_state.data[st.session_state.data["Fecha"] >= fecha].index  
-    for j in indices:  
-        if pd.notna(descuento_real):  
-            st.session_state.data.at[j, "Saldo Acumulado"] += descuento_real  
+ 
+# Actualizar saldo acumulado con descuento real (solo una vez por nota)
+if "descuentos_aplicados" not in st.session_state:
+    st.session_state.descuentos_aplicados = set()
+
+for i, nota in st.session_state.notas.iterrows():
+    fecha = nota["Fecha"]
+    descuento_real = nota["Descuento real"]
+    if pd.notna(descuento_real) and (i not in st.session_state.descuentos_aplicados):
+        indices = st.session_state.data[st.session_state.data["Fecha"] >= fecha].index
+        for j in indices:
+            st.session_state.data.at[j, "Saldo Acumulado"] += descuento_real
+        st.session_state.descuentos_aplicados.add(i)
 
 # Mostrar tabla  
 st.subheader("Tabla de Registros")  
@@ -260,7 +265,7 @@ st.dataframe(df_display.drop(columns=["Mostrar"], errors="ignore"), use_containe
 st.subheader("Tabla de Notas de Debito")  
 st.dataframe(st.session_state.notas.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)  
 
-# Eliminar Nota de Drbito  
+# Eliminar Nota de Debito  
 st.subheader("Eliminar una Nota de Debito")  
 if not st.session_state.notas.empty:  
     st.session_state.notas["Mostrar"] = st.session_state.notas.apply(  
