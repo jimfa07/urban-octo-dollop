@@ -13,7 +13,8 @@ DEBIT_NOTES_FILE = "registro_notas_debito.pkl"
 st.set_page_config(page_title="Registro Proveedores y Depositos", layout="wide")
 st.title("Registro de Proveedores - Producto Pollo")
 
-# Botón para importar CSV
+# Botón para importar Excel
+
 st.markdown("### Importar datos desde CSV")
 archivo_csv = st.file_uploader("Selecciona un archivo CSV", type=["csv"])
 
@@ -31,6 +32,8 @@ if archivo_csv is not None:
         st.session_state.data.to_pickle(DATA_FILE)
     except Exception as e:
         st.error(f"Error al importar el archivo: {e}")
+
+
 
 # Listas
 proveedores = ["LIRIS SA", "Gallina 1", "Monze Anzules", "Medina"]
@@ -280,6 +283,13 @@ if opcion == "Registro":
         data=convertir_excel(st.session_state.data.drop(columns=["Mostrar"], errors="ignore")),
         file_name="registro_proveedores_depositos.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    st.download_button(
+        label="Descargar Registros CSV",
+        data=st.session_state.data.drop(columns=["Mostrar"], errors="ignore").to_csv(index=False).encode("utf-8"),
+        file_name="registro_proveedores_depositos.csv",
+        mime="text/csv"
     )
 
     with st.expander("Ver depositos registrados"):
