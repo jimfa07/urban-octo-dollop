@@ -256,11 +256,11 @@ df_display["Saldo diario"] = df_display["Saldo diario"].apply(lambda x: f"${x:,.
 df_display["Saldo Acumulado"] = df_display["Saldo Acumulado"].apply(lambda x: f"${x:,.2f}" if pd.notna(x) else "")  
 st.dataframe(df_display.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)  
 
-# Tabla de Notas de DÃ©bito  
+# Tabla de Notas de Debito  
 st.subheader("Tabla de Notas de Debito")  
 st.dataframe(st.session_state.notas.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)  
 
-# Eliminar Nota de DÃ©bito  
+# Eliminar Nota de Drbito  
 st.subheader("Eliminar una Nota de Debito")  
 if not st.session_state.notas.empty:  
     st.session_state.notas["Mostrar"] = st.session_state.notas.apply(  
