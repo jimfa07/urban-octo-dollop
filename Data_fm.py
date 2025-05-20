@@ -299,7 +299,7 @@ st.download_button(
 with st.expander("Ver depositos registrados"):  
     st.dataframe(st.session_state.df.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
-elif opcion == "Reporte Semanal"
+elif opcion == "Reporte Semanal":
     st.header("Reporte Semanal")
     df = st.session_state.data.copy()
     df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
