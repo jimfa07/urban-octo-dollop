@@ -113,78 +113,56 @@ if opcion == "Registro":
             st.sidebar.success("Deposito eliminado correctamente.")
     else:
         st.sidebar.write("No hay depositos para eliminar.")
-
-    # Importar datos
-    st.subheader("Importar datos desde Excel")
-    archivo_excel = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])
-
-    if archivo_excel is not None:
-        try:
-            df_importado = pd.read_excel(archivo_excel)
-            st.write("Vista previa de los datos importados:", df_importado.head())
-            
-            
-            if st.button("Cargar datos a registros"):
-                columnas_requeridas = [
-                    "Fecha", "Proveedor", "Producto", "Cantidad",
-                    "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
-                    "Cantidad de gavetas", "Precio Unitario ($)"
-                ]
-                if all(col in df_importado.columns for col in columnas_requeridas):
-                    df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
-
-                    for _, fila in df_importado.iterrows():
-                        cantidad = fila["Cantidad"]
-                        peso_salida = fila["Peso Salida (kg)"]
-                        peso_entrada = fila["Peso Entrada (kg)"]
-                        libras_restantes = (peso_salida - peso_entrada) * 2.20462
-                        promedio = libras_restantes / cantidad if cantidad != 0 else 0
-                        total = libras_restantes * fila["Precio Unitario ($)"]
-
-                        monto_deposito = st.session_state.df[
-                            (st.session_state.df["Fecha"] == fila["Fecha"]) &
-                            (st.session_state.df["Empresa"] == fila["Proveedor"])
-                        ]["Monto"].sum()
-
-                        saldo_diario = monto_deposito - total
-                        saldo_acumulado = (
-                            st.session_state.data["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario
-                            if not st.session_state.data["Saldo Acumulado"].dropna().empty else -243.30 + saldo_diario
-                        )
-
-                    nueva_fila = {
-                        "N": st.session_state.data["Fecha"].nunique() + 1,
-                        "Fecha": fila["Fecha"],
-                        "Proveedor": fila["Proveedor"],
-                        "Producto": fila["Producto"],
-                        "Cantidad": cantidad,
-                        "Peso Salida (kg)": peso_salida,
-                        "Peso Entrada (kg)": peso_entrada,
-                        "Tipo Documento": fila["Tipo Documento"],
-                        "Cantidad de gavetas": fila["Cantidad de gavetas"],
-                        "Precio Unitario ($)": fila["Precio Unitario ($)"],
-                        "Promedio": promedio,
-                        "Kilos Restantes": peso_salida - peso_entrada,
-                        "Libras Restantes": libras_restantes,
-                        "Total ($)": total,
-                        "Monto Deposito": monto_deposito,
-                        "Saldo diario": saldo_diario,
-                        "Saldo Acumulado": saldo_acumulado
-                    }
-
-                    st.session_state.data = pd.concat([st.session_state.data, pd.DataFrame([nueva_fila])], ignore_index=True)
-
-                st.success("Datos importados correctamente.")
-                st.session_state.data.to_pickle(DATA_FILE)
-            else:
-                st.error("El archivo no contiene todas las columnas requeridas.")
-    except Exception as e:
-        st.error(f"Error al cargar el archivo: {e}")
-
     
 
     # Registro de Proveedores
     st.subheader("Registro de Proveedores")
+    st.markdown("### Importar registros desde archivo Excel")
+    excel_file = st.file_uploader("Selecciona un archivo Excel", type=["xlsx", "xls"])
+    if excel_file:
+        try:
+            df_excel = pd.read_excel(excel_file)
+            st.write("Vista previa del archivo:")
+            st.dataframe(df_excel)
+
+            if st.button("Insertar registros del Excel"):
+                df_actual = st.session_state.data.copy()
+
+                for index, row in df_excel.iterrows():
+                    fecha = pd.to_datetime(row["Fecha"]).date()
+                    kilos_restantes = row["Peso Salida (kg)"] - row["Peso Entrada (kg)"]
+                    libras_restantes = kilos_restantes * 2.20462
+                    promedio = libras_restantes / row["Cantidad"] if row["Cantidad"] != 0 else 0
+                    total = libras_restantes * row["Precio Unitario ($)"]
+
+                    depositos = st.session_state.df.copy()
+                    monto_deposito = depositos[
+                        (depositos["Fecha"] == fecha) & (depositos["Empresa"] == row["Proveedor"])
+                    ]["Monto"].sum()
+
+                    saldo_diario = monto_deposito - total
+                    saldo_acumulado = df_actual["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario if df_actual["Saldo Acumulado"].dropna().shape[0] > 0 else -243.30 + saldo_diario
+
+                    nueva_fila = row.to_dict()
+                    nueva_fila["Producto"] = "Pollo"
+                    nueva_fila["Promedio"] = promedio
+                    nueva_fila["Kilos Restantes"] = kilos_restantes
+                    nueva_fila["Libras Restantes"] = libras_restantes
+                    nueva_fila["Total ($)"] = total
+                    nueva_fila["Monto Deposito"] = monto_deposito
+                    nueva_fila["Saldo diario"] = saldo_diario
+                    nueva_fila["Saldo Acumulado"] = saldo_acumulado
+                    nueva_fila["N"] = df_actual["Fecha"].nunique() + 1 if fecha not in df_actual["Fecha"].dropna().values else df_actual[df_actual["Fecha"] == fecha]["N"].iloc[0]
+
+                    df_actual = pd.concat([df_actual, pd.DataFrame([nueva_fila])], ignore_index=True)
+
+                st.session_state.data = df_actual
+                st.session_state.data.to_pickle(DATA_FILE)
+                st.success("Registros del Excel insertados correctamente.")
+    
+    except Exception as e:
+        st.error(f"Error al procesar el archivo: {e}")
+
     
     with st.form("formulario"):
         col1, col2, col3, col4 = st.columns(4)
