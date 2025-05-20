@@ -229,7 +229,8 @@ if opcion == "Registro":
         st.success("Nota de debito agregada correctamente")
 
     # Asegúrate que Saldo Acumulado sea numérico
-    st.session_state.data["Saldo Acumulado"] = pd.to_numeric(st.session_state.data["Saldo Acumulado"], errors="coerce")
+    if "Saldo Acumulado" in st.session_state.data.columns:
+        st.session_state.data["Saldo Acumulado"] = pd.to_numeric(st.session_state.data["Saldo Acumulado"], errors="coerce")
     
     # Actualizar saldo acumulado con descuento real
     for i, nota in st.session_state.notas.iterrows():
