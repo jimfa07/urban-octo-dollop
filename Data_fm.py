@@ -239,11 +239,14 @@ if opcion == "Registro":
 
     # Mostrar tabla
     st.subheader("Tabla de Registros")
-    st.session_state.data["Mostrar"] = st.session_state.data.apply(
-        lambda row: f"{row['Fecha']} - {row['Proveedor']} - ${row['Total ($)']:.2f}"
-        if pd.notna(row["Total ($)"]) else f"{row['Fecha']} - {row['Proveedor']} - Sin total",
-        axis=1
+    if not st.session_state.data.empty and "Fecha" in st.session_state.data.columns:
+        st.session_state.data["Mostrar"] = st.session_state.data.apply(
+            lambda row: f"{row['Fecha']} - {row['Proveedor']} - ${row['Total ($)']:.2f}"
+            if pd.notna(row["Total ($)"]) else f"{row['Fecha']} - {row['Proveedor']} - Sin total",
+            axis=1
     )
+
+
     registro_a_eliminar = st.selectbox("Selecciona un registro para eliminar", st.session_state.data["Mostrar"])
     if st.button("Eliminar Registro Seleccionado"):
         index_eliminar = st.session_state.data[st.session_state.data["Mostrar"] == registro_a_eliminar].index[0]
