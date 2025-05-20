@@ -246,15 +246,15 @@ if opcion == "Registro":
             axis=1
     )
 
-
-    registro_a_eliminar = st.selectbox("Selecciona un registro para eliminar", st.session_state.data["Mostrar"])
-    if st.button("Eliminar Registro Seleccionado"):
-        index_eliminar = st.session_state.data[st.session_state.data["Mostrar"] == registro_a_eliminar].index[0]
-        st.session_state.data.drop(index=index_eliminar, inplace=True)
-        st.session_state.data.reset_index(drop=True, inplace=True)
-        st.session_state.data.to_pickle(DATA_FILE)
-        st.success("Registro eliminado correctamente")
-
+    if not st.session_state.data.empty and "Mostrar" in st.session_state.data.columns:
+        registro_a_eliminar = st.selectbox("Selecciona un registro para eliminar", st.session_state.data["Mostrar"])
+        if st.button("Eliminar Registro Seleccionado"):
+            index_eliminar = st.session_state.data[st.session_state.data["Mostrar"] == registro_a_eliminar].index[0]
+            st.session_state.data.drop(index=index_eliminar, inplace=True)
+            st.session_state.data.reset_index(drop=True, inplace=True)
+            st.session_state.data.to_pickle(DATA_FILE)
+            st.success("Registro eliminado correctamente")
+    
     df_display = st.session_state.data.copy()
     df_display["Saldo diario"] = df_display["Saldo diario"].apply(lambda x: f"${x:,.2f}" if pd.notna(x) else "")
     df_display["Saldo Acumulado"] = df_display["Saldo Acumulado"].apply(lambda x: f"${x:,.2f}" if pd.notna(x) else "")
