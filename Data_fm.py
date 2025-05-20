@@ -119,7 +119,30 @@ else:
     st.sidebar.write("No hay depositos para eliminar.")  
 
 # Registro de Proveedores  
-st.subheader("Registro de Proveedores")  
+st.subheader("Registro de Proveedores") 
+
+# Cargar registros desde un archivo Excel
+st.subheader("Importar registros desde Excel")
+archivo_excel = st.file_uploader("Selecciona un archivo Excel (.xlsx)", type=["xlsx"])
+
+if archivo_excel is not None:
+    try:
+        df_importado = pd.read_excel(archivo_excel)
+        # Convertir columna de fecha si existe
+        if "Fecha" in df_importado.columns:
+            df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"], errors="coerce").dt.date
+
+        columnas_esperadas = set(st.session_state.data.columns) - {"Mostrar"}
+        if columnas_esperadas.issubset(set(df_importado.columns)):
+            st.session_state.data = pd.concat([st.session_state.data, df_importado], ignore_index=True)
+            st.session_state.data.to_pickle(DATA_FILE)
+            st.success("Datos importados correctamente desde Excel.")
+        else:
+            st.error("El archivo no contiene todas las columnas necesarias.")
+
+    except Exception as e:
+        st.error(f"Error al leer el archivo: {e}")
+
 with st.form("formulario"):  
     col1, col2, col3, col4 = st.columns(4)  
     with col1:  
