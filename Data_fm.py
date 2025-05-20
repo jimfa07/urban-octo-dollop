@@ -120,7 +120,7 @@ if opcion == "Registro":
         deposito_a_eliminar = st.sidebar.selectbox(
             "Selecciona un deposito a eliminar", st.session_state.df["Mostrar"]
         )
-        if st.sidebar.button("Eliminar depÃ³sito seleccionado"):
+        if st.sidebar.button("Eliminar deposito seleccionado"):
             index_eliminar = st.session_state.df[st.session_state.df["Mostrar"] == deposito_a_eliminar].index[0]
             st.session_state.df.drop(index=index_eliminar, inplace=True)
             st.session_state.df.reset_index(drop=True, inplace=True)
@@ -244,11 +244,11 @@ if opcion == "Registro":
     df_display["Saldo Acumulado"] = df_display["Saldo Acumulado"].apply(lambda x: f"${x:,.2f}" if pd.notna(x) else "")
     st.dataframe(df_display.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
-    # Tabla de Notas de DÃ©bito
+    # Tabla de Notas de Debito
     st.subheader("Tabla de Notas de Debito")
     st.dataframe(st.session_state.notas.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
-    # Eliminar Nota de DÃ©bito
+    # Eliminar Nota de Debito
     st.subheader("Eliminar una Nota de Debito")
     if not st.session_state.notas.empty:
         st.session_state.notas["Mostrar"] = st.session_state.notas.apply(
