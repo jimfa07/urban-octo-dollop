@@ -178,9 +178,9 @@ if opcion == "Registro":
 
                     st.success("Datos importados correctamente.")
                     st.session_state.data.to_pickle(DATA_FILE)
-              else:
+          else:
                     st.error("El archivo no contiene todas las columnas requeridas.")
-        except Exception as e:
+    except Exception as e:
             st.error(f"Error al cargar el archivo: {e}")
                     
     
