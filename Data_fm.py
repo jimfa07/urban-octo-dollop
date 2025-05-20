@@ -72,7 +72,7 @@ opcion = st.sidebar.selectbox("Selecciona una vista", ["Registro", "Reporte Sema
 
 if opcion == "Registro":
 # Sidebar - Registro de Depositos
-st.sidebar.header("Registro de Depositos")
+    st.sidebar.header("Registro de Depositos")
 with st.sidebar.form("registro_form"):
     fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
     empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
