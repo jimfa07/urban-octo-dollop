@@ -125,10 +125,10 @@ if opcion == "Registro":
             
             
             if st.button("Cargar datos a registros"):
-            columnas_requeridas = [
-                "Fecha", "Proveedor", "Producto", "Cantidad",
-                "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
-                "Cantidad de gavetas", "Precio Unitario ($)"
+                columnas_requeridas = [
+                    "Fecha", "Proveedor", "Producto", "Cantidad",
+                    "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
+                    "Cantidad de gavetas", "Precio Unitario ($)"
                 ]
                 if all(col in df_importado.columns for col in columnas_requeridas):
                     df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
