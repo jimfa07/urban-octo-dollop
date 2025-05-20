@@ -73,12 +73,12 @@ opcion = st.sidebar.selectbox("Selecciona una vista", ["Registro", "Reporte Sema
 if opcion == "Registro":
 # Sidebar - Registro de Depositos
     st.sidebar.header("Registro de Depositos")
-with st.sidebar.form("registro_form"):
-    fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
-    empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
-    agencia = st.selectbox("Agencia", agencias, key="agencia")
-    monto = st.number_input("Monto", min_value=0.0, format="%.2f", key="monto")
-    submit_d = st.form_submit_button("Agregar Deposito")
+    with st.sidebar.form("registro_form"):
+        fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
+        empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
+        agencia = st.selectbox("Agencia", agencias, key="agencia")
+        monto = st.number_input("Monto", min_value=0.0, format="%.2f", key="monto")
+        submit_d = st.form_submit_button("Agregar Deposito")
 
 if submit_d:  
     documento = "Deposito" if "Cajero" in agencia else "Transferencia"  
@@ -299,26 +299,26 @@ st.download_button(
 with st.expander("Ver depositos registrados"):  
     st.dataframe(st.session_state.df.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
-elif opcion == "Reporte Semanal":
-st.header("Reporte Semanal")
-df = st.session_state.data.copy()
-df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
-semana_actual = df["Fecha"].dt.isocalendar().week.max()
-df_semana = df[df["Fecha"].dt.isocalendar().week == semana_actual]
-st.dataframe(df_semana.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
+elif opcion == "Reporte Semanal"
+    st.header("Reporte Semanal")
+    df = st.session_state.data.copy()
+    df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
+    semana_actual = df["Fecha"].dt.isocalendar().week.max()
+    df_semana = df[df["Fecha"].dt.isocalendar().week == semana_actual]
+    st.dataframe(df_semana.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
 elif opcion == "Reporte Mensual":
-  st.header("Reporte Mensual")
-df = st.session_state.data.copy()
-df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
-mes_actual = datetime.today().month
-df_mes = df[df["Fecha"].dt.month == mes_actual]
-st.dataframe(df_mes.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
+    st.header("Reporte Mensual")
+    df = st.session_state.data.copy()
+    df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
+    mes_actual = datetime.today().month
+    df_mes = df[df["Fecha"].dt.month == mes_actual]
+    st.dataframe(df_mes.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
 
 elif opcion == "Graficos":
-st.header("Graficos de Proveedores")
-df = st.session_state.data.copy()
-df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
+    st.header("Graficos de Proveedores")
+    df = st.session_state.data.copy()
+    df["Fecha"] = pd.to_datetime(df["Fecha"], errors="coerce")
 
 total_por_proveedor = df.groupby("Proveedor")["Total ($)"].sum().sort_values(ascending=False)  
 fig, ax = plt.subplots()  
