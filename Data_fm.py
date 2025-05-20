@@ -117,71 +117,71 @@ if opcion == "Registro":
 
     # Registro de Proveedores
     st.subheader("Registro de Proveedores")
-    # Carga de archivo Excel
-    st.subheader("Importar datos desde Excel")
-    archivo_excel = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])
+    
+st.subheader("Importar datos desde Excel")
+archivo_excel = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])
 
-    if archivo_excel is not None:
-        try:
-            df_importado = pd.read_excel(archivo_excel)
-            st.write("Vista previa de los datos importados:", df_importado.head())
+if archivo_excel is not None:
+    try:
+        df_importado = pd.read_excel(archivo_excel)
+        st.write("Vista previa de los datos importados:", df_importado.head())
 
-            if st.button("Cargar datos a registros"):
-                columnas_requeridas = [
-                    "Fecha", "Proveedor", "Producto", "Cantidad",
-                    "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
-                    "Cantidad de gavetas", "Precio Unitario ($)"
-                ]
-                if all(col in df_importado.columns for col in columnas_requeridas):
-                    df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
+        if st.button("Cargar datos a registros"):
+            columnas_requeridas = [
+                "Fecha", "Proveedor", "Producto", "Cantidad",
+                "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
+                "Cantidad de gavetas", "Precio Unitario ($)"
+            ]
+            if all(col in df_importado.columns for col in columnas_requeridas):
+                df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
 
-                    for _, fila in df_importado.iterrows():
-                        cantidad = fila["Cantidad"]
-                        peso_salida = fila["Peso Salida (kg)"]
-                        peso_entrada = fila["Peso Entrada (kg)"]
-                        libras_restantes = (peso_salida - peso_entrada) * 2.20462
-                        promedio = libras_restantes / cantidad if cantidad != 0 else 0
-                        total = libras_restantes * fila["Precio Unitario ($)"]
+                for _, fila in df_importado.iterrows():
+                    cantidad = fila["Cantidad"]
+                    peso_salida = fila["Peso Salida (kg)"]
+                    peso_entrada = fila["Peso Entrada (kg)"]
+                    libras_restantes = (peso_salida - peso_entrada) * 2.20462
+                    promedio = libras_restantes / cantidad if cantidad != 0 else 0
+                    total = libras_restantes * fila["Precio Unitario ($)"]
 
-                        monto_deposito = st.session_state.df[
-                            (st.session_state.df["Fecha"] == fila["Fecha"]) &
-                            (st.session_state.df["Empresa"] == fila["Proveedor"])
-                        ]["Monto"].sum()
+                    monto_deposito = st.session_state.df[
+                        (st.session_state.df["Fecha"] == fila["Fecha"]) &
+                        (st.session_state.df["Empresa"] == fila["Proveedor"])
+                    ]["Monto"].sum()
 
-                        saldo_diario = monto_deposito - total
-                        saldo_acumulado = (
-                            st.session_state.data["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario
-                            if not st.session_state.data["Saldo Acumulado"].dropna().empty else -243.30 + saldo_diario
-                        )
+                    saldo_diario = monto_deposito - total
+                    saldo_acumulado = (
+                        st.session_state.data["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario
+                        if not st.session_state.data["Saldo Acumulado"].dropna().empty else -243.30 + saldo_diario
+                    )
 
-                        nueva_fila = {
-                            "N": st.session_state.data["Fecha"].nunique() + 1,
-                            "Fecha": fila["Fecha"],
-                            "Proveedor": fila["Proveedor"],
-                            "Producto": fila["Producto"],
-                            "Cantidad": cantidad,
-                            "Peso Salida (kg)": peso_salida,
-                            "Peso Entrada (kg)": peso_entrada,
-                            "Tipo Documento": fila["Tipo Documento"],
-                            "Cantidad de gavetas": fila["Cantidad de gavetas"],
-                            "Precio Unitario ($)": fila["Precio Unitario ($)"],
-                            "Promedio": promedio,
-                            "Kilos Restantes": peso_salida - peso_entrada,
-                            "Libras Restantes": libras_restantes,
-                            "Total ($)": total,
-                            "Monto Deposito": monto_deposito,
-                            "Saldo diario": saldo_diario,
-                            "Saldo Acumulado": saldo_acumulado
-                        }
+                    nueva_fila = {
+                        "N": st.session_state.data["Fecha"].nunique() + 1,
+                        "Fecha": fila["Fecha"],
+                        "Proveedor": fila["Proveedor"],
+                        "Producto": fila["Producto"],
+                        "Cantidad": cantidad,
+                        "Peso Salida (kg)": peso_salida,
+                        "Peso Entrada (kg)": peso_entrada,
+                        "Tipo Documento": fila["Tipo Documento"],
+                        "Cantidad de gavetas": fila["Cantidad de gavetas"],
+                        "Precio Unitario ($)": fila["Precio Unitario ($)"],
+                        "Promedio": promedio,
+                        "Kilos Restantes": peso_salida - peso_entrada,
+                        "Libras Restantes": libras_restantes,
+                        "Total ($)": total,
+                        "Monto Deposito": monto_deposito,
+                        "Saldo diario": saldo_diario,
+                        "Saldo Acumulado": saldo_acumulado
+                    }
 
-                        st.session_state.data = pd.concat([st.session_state.data, pd.DataFrame([nueva_fila])], ignore_index=True)
+                    st.session_state.data = pd.concat([st.session_state.data, pd.DataFrame([nueva_fila])], ignore_index=True)
 
-                    st.success("Datos importados correctamente.")
-                    st.session_state.data.to_pickle(DATA_FILE)
-          else:
-                    st.error("El archivo no contiene todas las columnas requeridas.")
+                st.success("Datos importados correctamente.")
+                st.session_state.data.to_pickle(DATA_FILE)
+            else:
+                st.error("El archivo no contiene todas las columnas requeridas.")
     except Exception as e:
-            st.error(f"Error al cargar el archivo: {e}")
+        st.error(f"Error al cargar el archivo: {e}")
                     
     
     with st.form("formulario"):
