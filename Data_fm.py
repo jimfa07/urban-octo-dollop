@@ -5,7 +5,7 @@ from io import BytesIO
 import os
 import matplotlib.pyplot as plt
 
-Archivos
+# Archivos
 
 DATA_FILE = "registro_data.pkl"
 DEPOSITS_FILE = "registro_depositos.pkl"
@@ -14,7 +14,7 @@ DEBIT_NOTES_FILE = "registro_notas_debito.pkl"
 st.set_page_config(page_title="Registro Proveedores y Depositos", layout="wide")
 st.title("Registro de Proveedores - Producto Pollo")
 
-Listas
+# Listas
 
 proveedores = ["LIRIS SA", "Gallina 1", "Monze Anzules", "Medina"]
 tipos_documento = ["Factura", "Nota de debito", "Nota de credito"]
@@ -25,7 +25,7 @@ agencias = [
 "Banco Bolivariano"
 ]
 
-Inicializar estados
+# Inicializar estados
 
 if "data" not in st.session_state:
 if os.path.exists(DATA_FILE):
@@ -65,7 +65,7 @@ st.session_state.notas = pd.DataFrame(columns=[
 "Fecha", "Libras calculadas", "Descuento", "Descuento posible", "Descuento real"
 ])
 
-Navegacion entre secciones
+# Navegacion entre secciones
 
 opcion = st.sidebar.selectbox("Selecciona una vista", ["Registro", "Reporte Semanal", "Reporte Mensual", "Graficos"])
 
