@@ -13,27 +13,33 @@ DEBIT_NOTES_FILE = "registro_notas_debito.pkl"
 st.set_page_config(page_title="Registro Proveedores y Depositos", layout="wide")
 st.title("Registro de Proveedores - Producto Pollo")
 
-# Botón para importar Excel
+# Botón para importar CSV o Excel
 
-st.markdown("### Importar datos desde CSV")
-archivo_csv = st.file_uploader("Selecciona un archivo CSV", type=["csv"])
+st.markdown("### Importar datos desde CSV o Excel")
+archivo_subido = st.file_uploader("Selecciona un archivo CSV o Excel", type=["csv", "xlsx"])
 
 # Inicializar st.session_state.data antes de importar CSV
 if "data" not in st.session_state:
     st.session_state.data = pd.DataFrame()
 
-if archivo_csv is not None:
+if archivo_subido is not None:
     try:
-        df_csv = pd.read_csv(archivo_csv)
-        if "Fecha" in df_csv.columns:
-            df_csv["Fecha"] = pd.to_datetime(df_csv["Fecha"], errors="coerce").dt.date
-        st.session_state.data = pd.concat([st.session_state.data, df_csv], ignore_index=True)
-        st.success("Archivo CSV importado correctamente.")
+        if archivo_subido.name.endswith(".csv"):
+            df_importado = pd.read_csv(archivo_subido)
+        elif archivo_subido.name.endswith(".xlsx"):
+            df_importado = pd.read_excel(archivo_subido)
+        else:
+            st.error("Formato no soportado.")
+            df_importado = pd.DataFrame()
+
+        if "Fecha" in df_importado.columns:
+            df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"], errors="coerce").dt.date
+
+        st.session_state.data = pd.concat([st.session_state.data, df_importado], ignore_index=True)
+        st.success("Archivo importado correctamente.")
         st.session_state.data.to_pickle(DATA_FILE)
     except Exception as e:
         st.error(f"Error al importar el archivo: {e}")
-
-
 
 # Listas
 proveedores = ["LIRIS SA", "Gallina 1", "Monze Anzules", "Medina"]
