@@ -28,41 +28,42 @@ agencias = [
 # Inicializar estados
 
 if "data" not in st.session_state:
-if os.path.exists(DATA_FILE):
-st.session_state.data = pd.read_pickle(DATA_FILE)
-st.session_state.data["Fecha"] = pd.to_datetime(
-st.session_state.data["Fecha"], errors="coerce").dt.date
-else:
-st.session_state.data = pd.DataFrame(columns=[
-"N", "Fecha", "Proveedor", "Producto", "Cantidad",
-"Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
-"Cantidad de gavetas", "Precio Unitario ($)", "Promedio",
-"Kilos Restantes", "Libras Restantes", "Total ($)",
-"Monto Deposito", "Saldo diario", "Saldo Acumulado"
+    if os.path.exists(DATA_FILE):
+        st.session_state.data = pd.read_pickle(DATA_FILE)
+        st.session_state.data["Fecha"] = pd.to_datetime(
+            st.session_state.data["Fecha"], errors="coerce").dt.date
+    else:
+        st.session_state.data = pd.DataFrame(columns=[
+            "N", "Fecha", "Proveedor", "Producto", "Cantidad",
+            "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
+            "Cantidad de gavetas", "Precio Unitario ($)", "Promedio",
+            "Kilos Restantes", "Libras Restantes", "Total ($)",
+            "Monto Deposito", "Saldo diario", "Saldo Acumulado"
 ])
+        
 fila_inicial = {col: None for col in st.session_state.data.columns}
 fila_inicial["Saldo diario"] = 0.00
 fila_inicial["Saldo Acumulado"] = -243.30
 st.session_state.data = pd.concat(
-[pd.DataFrame([fila_inicial]), st.session_state.data], ignore_index=True
+    [pd.DataFrame([fila_inicial]), st.session_state.data], ignore_index=True
 )
 
 if "df" not in st.session_state:
-if os.path.exists(DEPOSITS_FILE):
-st.session_state.df = pd.read_pickle(DEPOSITS_FILE)
-st.session_state.df["Fecha"] = pd.to_datetime(
-st.session_state.df["Fecha"], errors="coerce").dt.date
-else:
-st.session_state.df = pd.DataFrame(columns=[
-"Fecha", "Empresa", "Agencia", "Monto", "Documento", "N"
+    if os.path.exists(DEPOSITS_FILE):
+        st.session_state.df = pd.read_pickle(DEPOSITS_FILE)
+        st.session_state.df["Fecha"] = pd.to_datetime(
+            st.session_state.df["Fecha"], errors="coerce").dt.date
+    else:
+        st.session_state.df = pd.DataFrame(columns=[
+            "Fecha", "Empresa", "Agencia", "Monto", "Documento", "N"
 ])
 
 if "notas" not in st.session_state:
-if os.path.exists(DEBIT_NOTES_FILE):
-st.session_state.notas = pd.read_pickle(DEBIT_NOTES_FILE)
-else:
-st.session_state.notas = pd.DataFrame(columns=[
-"Fecha", "Libras calculadas", "Descuento", "Descuento posible", "Descuento real"
+    if os.path.exists(DEBIT_NOTES_FILE):
+        st.session_state.notas = pd.read_pickle(DEBIT_NOTES_FILE)
+    else:
+        st.session_state.notas = pd.DataFrame(columns=[
+            "Fecha", "Libras calculadas", "Descuento", "Descuento posible", "Descuento real"
 ])
 
 # Navegacion entre secciones
@@ -73,11 +74,11 @@ if opcion == "Registro":
 # Sidebar - Registro de Depositos
 st.sidebar.header("Registro de Depositos")
 with st.sidebar.form("registro_form"):
-fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
-empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
-agencia = st.selectbox("Agencia", agencias, key="agencia")
-monto = st.number_input("Monto", min_value=0.0, format="%.2f", key="monto")
-submit_d = st.form_submit_button("Agregar Deposito")
+    fecha_d = st.date_input("Fecha del registro", value=datetime.today(), key="fecha_d")
+    empresa = st.selectbox("Empresa (Proveedor)", proveedores, key="empresa")
+    agencia = st.selectbox("Agencia", agencias, key="agencia")
+    monto = st.number_input("Monto", min_value=0.0, format="%.2f", key="monto")
+    submit_d = st.form_submit_button("Agregar Deposito")
 
 if submit_d:  
     documento = "Deposito" if "Cajero" in agencia else "Transferencia"  
