@@ -298,7 +298,6 @@ st.download_button(
 
 with st.expander("Ver depositos registrados"):  
     st.dataframe(st.session_state.df.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
-
 elif opcion == "Reporte Semanal":
     st.header("Reporte Semanal")
     df = st.session_state.data.copy()
@@ -306,7 +305,6 @@ elif opcion == "Reporte Semanal":
     semana_actual = df["Fecha"].dt.isocalendar().week.max()
     df_semana = df[df["Fecha"].dt.isocalendar().week == semana_actual]
     st.dataframe(df_semana.drop(columns=["Mostrar"], errors="ignore"), use_container_width=True)
-
 elif opcion == "Reporte Mensual":
     st.header("Reporte Mensual")
     df = st.session_state.data.copy()
