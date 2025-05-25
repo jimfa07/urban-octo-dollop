@@ -251,7 +251,7 @@ if archivo_excel is not None:
             descuento = st.number_input("Descuento (%)", min_value=0.0, max_value=1.0, step=0.01)
         with col3:
             descuento_real = st.number_input("Descuento Real ($)", min_value=0.0, step=0.01)
-        agregar_nota = st.form_submit_button("Agregar Nota de Debito")
+            agregar_nota = st.form_submit_button("Agregar Nota de Debito")
 
     if agregar_nota:
         df = st.session_state.data.copy()
