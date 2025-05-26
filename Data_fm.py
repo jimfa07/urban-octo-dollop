@@ -114,44 +114,44 @@ if opcion == "Registro":
     else:
         st.sidebar.write("No hay depositos para eliminar.")
     
-
     # Registro de Proveedores
     st.subheader("Registro de Proveedores")
     
     st.subheader("Importar datos desde Excel")
     archivo_excel = st.file_uploader("Selecciona un archivo Excel", type=["xlsx"])
+
     if archivo_excel is not None:
         try:
             df_importado = pd.read_excel(archivo_excel)
             st.write("Vista previa de los datos importados:", df_importado.head())
-            
+
             if st.button("Cargar datos a registros"):
                 columnas_requeridas = [
                     "Fecha", "Proveedor", "Producto", "Cantidad",
                     "Peso Salida (kg)", "Peso Entrada (kg)", "Tipo Documento",
                     "Cantidad de gavetas", "Precio Unitario ($)"
-            ]
-            if all(col in df_importado.columns for col in columnas_requeridas):
-                df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
+                ]
+                if all(col in df_importado.columns for col in columnas_requeridas):
+                    df_importado["Fecha"] = pd.to_datetime(df_importado["Fecha"]).dt.date
 
-                for _, fila in df_importado.iterrows():
-                    cantidad = fila["Cantidad"]
-                    peso_salida = fila["Peso Salida (kg)"]
-                    peso_entrada = fila["Peso Entrada (kg)"]
-                    libras_restantes = (peso_salida - peso_entrada) * 2.20462
-                    promedio = libras_restantes / cantidad if cantidad != 0 else 0
-                    total = libras_restantes * fila["Precio Unitario ($)"]
+                    for _, fila in df_importado.iterrows():
+                        cantidad = fila["Cantidad"]
+                        peso_salida = fila["Peso Salida (kg)"]
+                        peso_entrada = fila["Peso Entrada (kg)"]
+                        libras_restantes = (peso_salida - peso_entrada) * 2.20462
+                        promedio = libras_restantes / cantidad if cantidad != 0 else 0
+                        total = libras_restantes * fila["Precio Unitario ($)"]
 
-                    monto_deposito = st.session_state.df[
-                        (st.session_state.df["Fecha"] == fila["Fecha"]) &
-                        (st.session_state.df["Empresa"] == fila["Proveedor"])
-                    ]["Monto"].sum()
+                        monto_deposito = st.session_state.df[
+                            (st.session_state.df["Fecha"] == fila["Fecha"]) &
+                            (st.session_state.df["Empresa"] == fila["Proveedor"])
+                        ]["Monto"].sum()
 
-                    saldo_diario = monto_deposito - total
-                    saldo_acumulado = (
-                        st.session_state.data["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario
-                        if not st.session_state.data["Saldo Acumulado"].dropna().empty else -243.30 + saldo_diario
-                    )
+                        saldo_diario = monto_deposito - total
+                        saldo_acumulado = (
+                            st.session_state.data["Saldo Acumulado"].dropna().iloc[-1] + saldo_diario
+                            if not st.session_state.data["Saldo Acumulado"].dropna().empty else -243.30 + saldo_diario
+                        )
 
                         nueva_fila = {
                             "N": st.session_state.data["Fecha"].nunique() + 1,
@@ -182,7 +182,6 @@ if opcion == "Registro":
         except Exception as e:
             st.error(f"Error al cargar el archivo: {e}")
                     
-    
     with st.form("formulario"):
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -250,7 +249,7 @@ if opcion == "Registro":
             descuento = st.number_input("Descuento (%)", min_value=0.0, max_value=1.0, step=0.01)
         with col3:
             descuento_real = st.number_input("Descuento Real ($)", min_value=0.0, step=0.01)
-            agregar_nota = st.form_submit_button("Agregar Nota de Debito")
+        agregar_nota = st.form_submit_button("Agregar Nota de Debito")
 
     if agregar_nota:
         df = st.session_state.data.copy()
